@@ -17,18 +17,24 @@ def get_weather() -> None:
         "q": FILTERING
     }
     print(f"Performing request to Weather API for city {FILTERING}...")
+
     try:
         response = requests.get(URL, params=params)
         response.raise_for_status()
-        data = response.json()
-        city = data["location"]["name"]
-        country = data["location"]["country"]
-        time = data["current"]["last_updated"]
-        temp = data["current"]["temp_c"]
-        condition = data["current"]["condition"]["text"]
-        print(f"{city}/{country} {time} Weather: {temp} Celsius, {condition}")
     except requests.RequestException as e:
         print("Error while getting weather data:", e)
+        return
+
+    data = response.json()
+    location = data.get("location", {})
+    current = data.get("current", {})
+    city = location.get("name", "N/A")
+    country = location.get("country", "N/A")
+    time = current.get("last_updated", "N/A")
+    temp = current.get("temp_c", "N/A")
+    condition = current.get("condition", {})
+    condition_text = condition.get("text", "N/A")
+    print(f"{city}/{country} {time} Weather: {temp} Celsius, {condition_text}")
 
 
 if __name__ == "__main__":
